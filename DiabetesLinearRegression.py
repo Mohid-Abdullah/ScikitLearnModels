@@ -3,32 +3,33 @@ from sklearn.datasets import load_diabetes
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
+import matplotlib.pyplot as plt
 
-# Loading diabetes dataset
 diabetes = load_diabetes()
 
-df = pd.DataFrame(diabetes.data, columns=diabetes.feature_names)
-df['target'] = diabetes.target
+newdf = pd.DataFrame(diabetes.data, columns= diabetes.feature_names)
+newdf['target'] = diabetes.target
+print(newdf.head())
 
-print(df.head())
+x = newdf.drop('target', axis=1)
+y = newdf['target']
 
-X = df.drop('target', axis=1)
-y = df['target']            
-
-# Spliting into testing an training
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+x_train, x_test, y_train, y_test = train_test_split(x,y,test_size=0.2, random_state=47) 
 
 model = LinearRegression()
-model.fit(X_train, y_train)
+model.fit(x_train,y_train)
+y_pred = model.predict(x_test)
 
-y_pred = model.predict(X_test)
+new1 = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred})
+print(new1.head())
 
-mse = mean_squared_error(y_test, y_pred)
-r2 = r2_score(y_test, y_pred)
+print(f"MSE: {mean_squared_error(y_test, y_pred):.2f}")
+print(f"R² Score: {r2_score(y_test, y_pred):.2f}")
 
-print(f"Mean Squared Error: {mse:.2f}")
-print(f"R^2 Score: {r2:.2f}")
-
-print(model.coef_)
-print(model.intercept_) 
-
+plt.scatter(y_test, y_pred, alpha=0.6)
+plt.xlabel("Actual")
+plt.ylabel("Predicted")
+plt.title("Actual vs Predicted Values")
+plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--')  
+plt.grid(True)
+plt.show()
